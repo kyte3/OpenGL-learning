@@ -170,6 +170,9 @@
   <ItemGroup>
     <ClInclude Include="src\public\VertexBuffer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Shaders\basicShader.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

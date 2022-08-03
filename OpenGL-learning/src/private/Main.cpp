@@ -4,9 +4,49 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 
 /* shaders baby */
+
+static void ParseShader(const std::string& filepath, std::string& vertexSrc, std::string&pixelSrc)
+{
+    std::ifstream stream(filepath);
+
+    enum class ShaderType
+    {
+        None = 0,
+        Vertex = 1,
+        Pixel = 2
+    };
+
+    ShaderType shaderType = ShaderType::None;
+
+    std::string line;
+    while (getline(stream, line))
+    {
+        if (line.find("#type") != std::string::npos)
+        {
+            if (line.find("vertex") != std::string::npos)
+            {
+                shaderType = ShaderType::Vertex;
+            }
+            else if (line.find("pixel") != std::string::npos)
+            {
+                shaderType = ShaderType::Pixel;
+            }
+        }
+        else
+        {
+            switch (shaderType)
+            {
+            case ShaderType::Vertex:    vertexSrc.append(line + "\n"); break;
+                case ShaderType::Pixel:     pixelSrc.append(line + "\n"); break;
+            }
+        }
+    }
+}
 
 static unsigned int CompileShader(const std::string& shaderSrc, unsigned int shaderType)
 {
@@ -82,7 +122,7 @@ int main(void)
         // X Y R G B
         -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
          0.0f,  0.5f, 0.0f, 1.0f, 0.0f,
-         0.5f, -1.0f, 0.0f, 0.0f, 1.0f
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f
     };
 
     /* Buffer buffer buffer buffer buffer */
@@ -96,34 +136,8 @@ int main(void)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(2*sizeof(float)));
 
-    std::string vertexSrc = R"(
-        #version 450 core
-
-        layout(location = 0) in vec2 a_Pos;
-        layout(location = 1) in vec3 a_Colour;
-
-        out vec3 v_Colour;
-
-        void main()
-        {
-            v_Colour = a_Colour;
-            gl_Position = vec4(a_Pos.xy, 0.0, 1.0);
-        }
-    )";
-
-    std::string pixelSrc = R"(
-        #version 450 core
-
-        in vec3 v_Colour;
-
-        layout(location = 0) out vec4 u_Colour;
-
-        void main()
-        {
-            u_Colour = vec4(v_Colour.xyz, 1.0);
-        }
-    )";
-
+    std::string vertexSrc, pixelSrc;
+    ParseShader("res/Shaders/basicShader.glsl", vertexSrc, pixelSrc);
     unsigned int shader = CreateShader(vertexSrc, pixelSrc);
     glUseProgram(shader);
 
