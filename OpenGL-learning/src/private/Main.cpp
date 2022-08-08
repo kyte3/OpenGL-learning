@@ -1,43 +1,26 @@
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "Shader.h"
+#include "Window.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <iostream>
 
 int main(void)
 {
-    GLFWwindow* window;
+    Window window(1000, 1000, "Smort");
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1920, 1080, "Test Window", NULL, NULL);
-    if (!window) 
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-    /* hungry harold */
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-    /* vertices time */
-    float vertices[15] = {
+    float vertices[20] = {
         // X Y R G B
-        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 1.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f
+         0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, 1.0f, 0.0f, 1.0f
     };
 
     /* Buffer buffer buffer buffer buffer */
-    VertexBuffer vb (vertices, 15 * sizeof(float));
+    VertexBuffer vb (vertices, 20 * sizeof(float));
 
     // Vertex Position
     glEnableVertexAttribArray(0);
@@ -47,26 +30,28 @@ int main(void)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(2*sizeof(float)));
 
+    unsigned int indices[6] = {
+        0, 1, 2,
+        3, 1, 0
+    };
+
+    IndexBuffer ib(indices, 6);
+
     Shader shader("res/Shaders/basicShader.glsl");
     shader.Bind();
 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
+    while (!window.ShouldClose())
     {
-        /* Render here */
         glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        vb.Bind();
+        ib.Bind();
+        glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
+        window.OnUpdate();
     }
 
-    glfwTerminate();
+    window.ShutDown();
     return 0;
-
 }

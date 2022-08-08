@@ -162,6 +162,8 @@
     <ClCompile Include="src\private\Main.cpp" />
     <ClCompile Include="src\private\VertexBuffer.cpp" />
     <ClCompile Include="src\private\Shader.cpp" />
+    <ClCompile Include="src\private\IndexBuffer.cpp" />
+    <ClCompile Include="src\private\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\Glad\Glad.vcxproj">
@@ -169,8 +171,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\public\IndexBuffer.h" />
     <ClInclude Include="src\public\Shader.h" />
     <ClInclude Include="src\public\VertexBuffer.h" />
+    <ClInclude Include="src\public\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basicShader.glsl" />
