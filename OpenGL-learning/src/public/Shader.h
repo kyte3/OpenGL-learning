@@ -12,6 +12,8 @@ public:
 	void Bind();
 	void Unbind();
 
+	unsigned int GetRendererID() const { return m_RendererID; }
+
 private:
 	unsigned int m_RendererID;
 

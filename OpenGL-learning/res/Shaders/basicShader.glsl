@@ -18,9 +18,12 @@ void main()
 
 in vec3 v_Colour;
 
-layout(location = 0) out vec4 u_Colour;
+//uniform vec4 u_Colour;
+
+layout(location = 0) out vec4 o_Colour;
 
 void main()
 {
-    u_Colour = vec4(v_Colour.xyz, 1.0);
+    //o_Colour = u_Colour;
+    o_Colour = vec4(v_Colour.xyz, 1.0);
 }

@@ -4,6 +4,7 @@
 class IndexBuffer
 {
 public:
+	IndexBuffer() = default;
 	IndexBuffer(const void* indices, unsigned int size);
 	~IndexBuffer();
 

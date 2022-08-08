@@ -1,5 +1,4 @@
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
+#include "VertexArray.h"
 #include "Shader.h"
 #include "Window.h"
 
@@ -7,47 +6,73 @@
 
 #include <iostream>
 
+#define ASSERT(x) if (!(x)) __debugbreak();
+
+static void GLClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static void GLCheckError()
+{
+    while (GLenum error = glGetError())
+    {
+        std::cout << "[OpenGL ERROR] (" << error << ")" << std::endl;
+    }
+}
+
 int main(void)
 {
     Window window(1000, 1000, "Smort");
 
-    float vertices[20] = {
-        // X Y R G B
-         0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, 1.0f, 0.0f, 1.0f
-    };
+    VertexArray va;
+    
+    {
 
-    /* Buffer buffer buffer buffer buffer */
-    VertexBuffer vb (vertices, 20 * sizeof(float));
+        float vertices[20] = {
+            // X Y R G B
+             0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+            -0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+             0.5f, -0.5f, 1.0f, 0.0f, 1.0f
+        };
 
-    // Vertex Position
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
+        unsigned int indices[6] = {
+            0, 1, 2,
+            3, 1, 0
+        };
 
-    // Vertex Colour
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(2*sizeof(float)));
+        /* Buffer buffer buffer buffer buffer */
+        VertexBuffer* vb = new VertexBuffer(vertices, 20 * sizeof(float));
 
-    unsigned int indices[6] = {
-        0, 1, 2,
-        3, 1, 0
-    };
+        vb->SetLayout({
+            {ShaderDataType::Float2, "Position"},
+            {ShaderDataType::Float3, "Colour"}
+        });
 
-    IndexBuffer ib(indices, 6);
+        va.SetVertexBuffer(vb);
+
+        IndexBuffer* ib = new IndexBuffer(indices, 6);
+        va.SetIndexBuffer(ib);
+    }
 
     Shader shader("res/Shaders/basicShader.glsl");
-    shader.Bind();
+
+    //int location = glGetUniformLocation(shader.GetRendererID(), "u_Colour");
+    //glUniform4f(location, 1.0f, 0.0f, 1.0f, 1.0f);
+
+    va.Unbind();
+    shader.Unbind();
 
     while (!window.ShouldClose())
     {
+
         glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        vb.Bind();
-        ib.Bind();
-        glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr);
+        shader.Bind();
+        va.Bind();
+        glDrawElements(GL_TRIANGLES, va.GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
         window.OnUpdate();
     }
