@@ -1,3 +1,3 @@
 # OpenGL-learning
 
-Today, an adventure into the wild.
+Today, we adventure into the wild.
